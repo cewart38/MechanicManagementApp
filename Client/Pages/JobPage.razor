@@ -1,0 +1,55 @@
+﻿@page "/jobs"
+@page "/jobs/{id:int}"
+@inject IJobService JobService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Jobs</PageTitle>
+
+<h3>All Jobs Page</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Start Date</th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var job in JobService.Jobs)
+        {
+            <tr>
+                <td>@job.JobTitle</td>
+                <td>@job.StartDate</td>
+                <td>
+                    <button class="btn-primary" @onclick="(() => ShowJob(job.ID))"><i class="oi oi-pencil"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewJob(Id)">Create New Job</button>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await JobService.GetCustomerJobs((int)Id);
+    }
+
+    void ShowJob(int id)
+    {
+        NavigationManager.NavigateTo($"job/{id}");
+    }
+
+    void CreateNewJob(int id)
+    {
+        NavigationManager.NavigateTo($"job/{id}");
+    }
+}

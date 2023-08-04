@@ -1,0 +1,71 @@
+﻿@page "/job"
+@page "/job/{id:int}"
+@inject IJobService JobService
+
+@if (Id == null)
+{
+    <PageTitle>Create a new job</PageTitle>
+    <h3>Create a new job</h3>
+}
+else
+{
+    <PageTitle>Edit @job.JobTitle</PageTitle>
+    <h3>Edit @job.JobTitle</h3>
+}
+
+<EditForm Model="job" OnSubmit="HandleSubmit">
+    <div>
+        <label for="jobtitle">Job Title</label>
+        <InputText id="jobtitle" @bind-Value="job.JobTitle" class="form-control"></InputText>
+    </div>
+    <br />
+    <div>
+        <button type="submit" class="btn btn-primary">@btnText</button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteJob">Delete Job</button>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    Job job = new Job();
+
+    string btnText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Job" : "Update Job";
+        await JobService.GetJobs();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+
+        }
+        else
+        {
+            job = await JobService.GetSingleJob((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await JobService.CreateJob(job);
+        }
+        else
+        {
+            await JobService.UpdateJob(job);
+        }
+    }
+
+    async Task DeleteJob()
+    {
+        await JobService.DeleteJob(job.ID);
+    }
+}
