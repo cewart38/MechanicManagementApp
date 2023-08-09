@@ -1,6 +1,7 @@
 ﻿@page "/jobs"
 @page "/jobs/{id:int}"
 @inject IJobService JobService
+@inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Jobs</PageTitle>
@@ -30,14 +31,14 @@
         }
     </tbody>
 </table>
-<button class="btn btn-primary" @onclick="CreateNewJob(Id)">Create New Job</button>
+<button class="btn btn-primary" @onclick="OnClick">Create New Job</button>
+
 
 @code {
     [Parameter]
-    public int? Id { get; set; }
+    public int Id { get; set; }
 
 
-    
     protected override async Task OnInitializedAsync()
     {
         await JobService.GetCustomerJobs((int)Id);
@@ -48,7 +49,12 @@
         NavigationManager.NavigateTo($"job/{id}");
     }
 
-    void CreateNewJob(int id)
+    private async Task OnClick()
+    {
+        await CreateNewJob(Id);
+    }
+
+    public async Task CreateNewJob(int id)
     {
         NavigationManager.NavigateTo($"job/{id}");
     }

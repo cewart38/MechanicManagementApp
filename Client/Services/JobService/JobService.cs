@@ -53,8 +53,9 @@ namespace MechanicApp.Client.Services.JobService
             }
         }
 
-        public async Task CreateJob(Job job)
+        public async Task CreateJob(Job job, int CustId)
         {
+            job.CustomerId = CustId;
             var result = await _http.PostAsJsonAsync("api/job", job);
             await SetJobs(result);
         }

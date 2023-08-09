@@ -2,11 +2,11 @@
 {
     public interface IJobService
     {
-        List <Job> Jobs { get; set;  }
+        List<Job> Jobs { get; set; }
         Task<Job> GetSingleJob(int id);
         Task GetJobs();
         Task GetCustomerJobs(int id);
-        Task CreateJob(Job job);
+        Task CreateJob(Job job, int CustId);
         Task UpdateJob(Job job);
         Task DeleteJob(int id);
     }

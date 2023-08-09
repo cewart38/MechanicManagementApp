@@ -8,8 +8,8 @@ namespace MechanicApp.Server.Controllers
     {
         public readonly DataContext _context;
 
-        public JobController(DataContext context) 
-        { 
+        public JobController(DataContext context)
+        {
             _context = context;
         }
 
@@ -23,7 +23,7 @@ namespace MechanicApp.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<List<Job>>> GetCustomerJobs(int id)
         {
-            var job = await _context.Jobs.Where(x => x.ID == id).ToListAsync();
+            var job = await _context.Jobs.Where(x => x.CustomerId == id).ToListAsync();
             if (job == null)
             {
                 return NotFound("No Jobs Found");
