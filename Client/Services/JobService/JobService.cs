@@ -33,7 +33,7 @@ namespace MechanicApp.Client.Services.JobService
 
         public async Task<Job> GetSingleJob(int id)
         {
-            var result = await _http.GetFromJsonAsync<Job>($"api/job/singlejob/{id}");
+            var result = await _http.GetFromJsonAsync<Job>($"singlejob/{id}");
             if (result != null)
                 return result;
             throw new Exception("Job not found");

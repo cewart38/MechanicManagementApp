@@ -86,12 +86,21 @@ namespace MechanicApp.Server.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("FinishDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JobTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("TotalHours")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -104,15 +113,67 @@ namespace MechanicApp.Server.Migrations
                         {
                             ID = 1,
                             CustomerId = 1,
+                            FinishDate = new DateTime(2023, 5, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsCompleted = true,
                             JobTitle = "MOT Check",
-                            StartDate = new DateTime(2023, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartDate = new DateTime(2023, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            TotalHours = 15
                         },
                         new
                         {
                             ID = 2,
                             CustomerId = 2,
+                            IsCompleted = false,
                             JobTitle = "Service",
                             StartDate = new DateTime(2023, 4, 22, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
+            modelBuilder.Entity("MechanicApp.Shared.Part", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<double>("Cost")
+                        .HasColumnType("float");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("Parts");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            Cost = 30.5,
+                            JobId = 1,
+                            Name = "Brake Pads"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            Cost = 60.299999999999997,
+                            JobId = 1,
+                            Name = "Brake Disc"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            Cost = 10.0,
+                            JobId = 1,
+                            Name = "Brake Fluid"
                         });
                 });
 
@@ -125,6 +186,17 @@ namespace MechanicApp.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("MechanicApp.Shared.Part", b =>
+                {
+                    b.HasOne("MechanicApp.Shared.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
 ﻿@page "/job/{custid:int}"
-@page "/job/{jobid:int}/{custid:int}"
+@page "/job/{custid:int}/{jobid:int}"
 @inject IJobService JobService
+@inject IPartService PartService
 
 @if (JobId == null)
 {
@@ -22,12 +23,84 @@ else
         <label for="startdate">Start Date</label>
         <InputDate id="startdate" @bind-Value="job.StartDate" class="form-control"></InputDate>
     </div>
+    <div>
+        <label>
+            <InputCheckbox @bind-Value="job.IsCompleted" />
+            Job Completed
+        </label>
+    </div>
+
+    @if (job.IsCompleted)
+    {
+        <div>
+            <label for="finishdate">Finish Date</label>
+            <InputDate id="finishdate" @bind-Value="job.FinishDate" class="form-control"></InputDate>
+        </div>
+        <div>
+            <label for="totalhours">Total Hours</label>
+            <InputNumber id="totalhours" @bind-Value="job.TotalHours" class="form-control"></InputNumber>
+        </div>
+    }
     <br />
     <div>
         <button type="submit" class="btn btn-primary">@btnText</button>
         <button type="button" class="btn btn-danger" @onclick="DeleteJob">Delete Job</button>
     </div>
 </EditForm>
+
+@if (JobId != null)
+{
+
+    @if (showPartTable)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Cost (£)</th>
+                    <th> </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var part in PartService.Parts)
+                {
+                    <tr>
+                        <td>@part.Name</td>
+                        <td>@part.Cost</td>
+                        <td><button class="btn btn-link text-danger" @onclick="() => DeletePart(part.ID)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    @if (!showPartForm)
+    {
+        <div class="mb-4">
+            <button class="btn btn-primary" @onclick="ShowPartForm">Create Part</button>
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <h4>Create New Part</h4>
+            <div class="form-group">
+                <label for="partName">Part Name</label>
+                <input type="text" class="form-control" id="partName" @bind="part.Name" />
+            </div>
+            <div class="form-group">
+                <label for="partCost">Cost (£)</label>
+                <input type="number" class="form-control" id="partCost" @bind="part.Cost" />
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-primary" @onclick="CreateNewPart">Save Part</button>
+                <button class="btn btn-danger" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
+    }
+}
 
 
 @code {
@@ -38,9 +111,14 @@ else
     public int? JobId { get; set; }
 
     Job job = new Job
-        {
-            StartDate = DateTime.Today
-        };
+    {
+        StartDate = DateTime.Today
+    };
+
+    Part part = new Part();
+
+    bool showPartForm = false;
+    bool showPartTable = true;
 
     string btnText = string.Empty;
 
@@ -48,6 +126,7 @@ else
     {
         btnText = JobId == null ? "Save New Job" : "Update Job";
         await JobService.GetJobs();
+        await PartService.GetJobParts((int)JobId);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -77,5 +156,29 @@ else
     async Task DeleteJob()
     {
         await JobService.DeleteJob(job.ID);
+    }
+
+    void ShowPartForm()
+    {
+        showPartForm = true;
+    }
+
+    void Cancel()
+    {
+        showPartForm = false;
+    }
+
+    async Task CreateNewPart()
+    {
+        await PartService.CreatePart(part, (int)JobId);
+        await PartService.GetJobParts((int)JobId);
+        part = new Part();
+        showPartForm = false;
+        showPartTable = true;
+    }
+
+    async Task DeletePart(int id)
+    {
+        await PartService.DeletePart(id);
     }
 }

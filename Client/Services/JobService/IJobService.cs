@@ -1,4 +1,4 @@
-﻿namespace MechanicApp.Client.Services.JobService
+﻿namespace MechanicApp.Client.Services.PartService
 {
     public interface IJobService
     {

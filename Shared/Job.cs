@@ -13,5 +13,8 @@ namespace MechanicApp.Shared
         public int CustomerId { get; set; }
         public DateTime StartDate { get; set; }
         public string JobTitle { get; set; } = String.Empty;
+        public bool IsCompleted { get; set; }
+        public DateTime? FinishDate { get; set; }
+        public int? TotalHours { get; set; }
     }
 }

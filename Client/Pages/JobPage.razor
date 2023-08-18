@@ -13,6 +13,8 @@
         <tr>
             <th>Job Title</th>
             <th>Start Date</th>
+            <th>Finish Date</th>
+            <th>Total Hours</th>
             <th>
 
             </th>
@@ -24,8 +26,18 @@
             <tr>
                 <td>@job.JobTitle</td>
                 <td>@job.StartDate</td>
+                @if (job.IsCompleted)
+                {
+                    <td>@job.FinishDate</td>
+                    <td>@job.TotalHours</td>
+                }
+                else
+                {
+                    <td>-</td>
+                    <td>-</td>
+                }
                 <td>
-                    <button class="btn-primary" @onclick="(() => ShowJob(job.ID))"><i class="oi oi-pencil"></i></button>
+                    <button class="btn-primary" @onclick="(() => ShowJob(Id, job.ID))"><i class="oi oi-pencil"></i></button>
                 </td>
             </tr>
         }
@@ -44,9 +56,9 @@
         await JobService.GetCustomerJobs((int)Id);
     }
 
-    void ShowJob(int id)
+    void ShowJob(int custid, int id)
     {
-        NavigationManager.NavigateTo($"job/{id}");
+        NavigationManager.NavigateTo($"job/{custid}/{id}");
     }
 
     private async Task OnClick()

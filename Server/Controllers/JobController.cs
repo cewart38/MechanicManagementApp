@@ -34,7 +34,7 @@ namespace MechanicApp.Server.Controllers
         [HttpGet("/singlejob/{id}")]
         public async Task<ActionResult<Job>> GetSingleJob(int id)
         {
-            var job = await _context.Customers.FirstOrDefaultAsync(x => x.ID == id);
+            var job = await _context.Jobs.FirstOrDefaultAsync(x => x.ID == id);
             if (job == null)
             {
                 return NotFound("No Job Found");
@@ -66,6 +66,9 @@ namespace MechanicApp.Server.Controllers
 
             dbJob.JobTitle = job.JobTitle;
             dbJob.StartDate = job.StartDate;
+            dbJob.IsCompleted = job.IsCompleted;
+            dbJob.FinishDate = job.FinishDate;
+            dbJob.TotalHours = job.TotalHours;
 
             await _context.SaveChangesAsync();
 
