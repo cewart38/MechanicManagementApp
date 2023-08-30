@@ -6,6 +6,7 @@
         Task<Part> GetSinglePart(int id);
         Task GetParts();
         Task GetJobParts(int id);
+        Task<List<Part>> GetPartsList();
         Task CreatePart(Part part, int JobId);
         Task UpdatePart(Part part);
         Task DeletePart(int id);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseWebRoot("wwwroot");
 
 // Add services to the container.
 

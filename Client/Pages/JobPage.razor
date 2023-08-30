@@ -1,48 +1,80 @@
 ﻿@page "/jobs"
 @page "/jobs/{id:int}"
+@using MechanicApp.Shared;
 @inject IJobService JobService
 @inject ICustomerService CustomerService
+@inject IPartService PartService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Jobs</PageTitle>
 
-<h3>All Jobs Page</h3>
+<div class="d-flex justify-content-end mb-3">
+    <label for="hourlyRate" class="mr-2" style="width: 100px;">Hourly Rate:</label>
+    <input type="number" id="hourlyRate" @bind="HourlyRate" class="form-control" style="max-width: 150px;" />
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Job Title</th>
-            <th>Start Date</th>
-            <th>Finish Date</th>
-            <th>Total Hours</th>
-            <th>
+<h3>Ongoing Jobs</h3>
 
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var job in JobService.Jobs)
-        {
+@if (JobService.Jobs.Any(j => !j.IsCompleted))
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@job.JobTitle</td>
-                <td>@job.StartDate</td>
-                @if (job.IsCompleted)
-                {
-                    <td>@job.FinishDate</td>
-                    <td>@job.TotalHours</td>
-                }
-                else
-                {
-                    <td>-</td>
-                    <td>-</td>
-                }
-                <td>
-                    <button class="btn-primary" @onclick="(() => ShowJob(Id, job.ID))"><i class="oi oi-pencil"></i></button>
-                </td>
+                <th>Job Title</th>
+                <th>Start Date</th>
+                <th>Edit</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var job in JobService.Jobs.Where(j => !j.IsCompleted))
+            {
+                <tr>
+                    <td>@job.JobTitle</td>
+                    <td>@job.StartDate.ToShortDateString()</td>
+                    <td>
+                        <button class="btn-primary" @onclick="(() => ShowJob(Id, job.ID))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No active jobs</p>
+}
+
+    <div style="margin-top: 200px;">
+        <h3>Completed Jobs</h3>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Start Date</th>
+                <th>Finish Date</th>
+                <th>Total Hours</th>
+                <th>Total Cost</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in JobService.Jobs.Where(j => j.IsCompleted))
+            {
+                <tr>
+                    <td>@job.JobTitle</td>
+                    <td>@job.StartDate.ToShortDateString()</td>
+                    <td>@(job.FinishDate != null ? job.FinishDate.Value.ToShortDateString() : "-")</td>
+                    <td>@job.TotalHours</td>
+                    <td>@(job.TotalHours * HourlyRate + PartsCost(job.ID))</td>
+                    <td>
+                        <button class="btn-primary" @onclick="(() => ShowJob(Id, job.ID))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 <button class="btn btn-primary" @onclick="OnClick">Create New Job</button>
 
 
@@ -50,10 +82,30 @@
     [Parameter]
     public int Id { get; set; }
 
+    Job job = new Job();
+
+    int HourlyRate = 20;
+
+    List<Part> Parts = new List<Part>();
 
     protected override async Task OnInitializedAsync()
     {
         await JobService.GetCustomerJobs((int)Id);
+        Parts = await PartService.GetPartsList();
+    }
+
+    double PartsCost(int jobId)
+    {
+        double totalCost = 0;
+
+        foreach(var part in Parts)
+        {
+            if (part.JobId == jobId)
+            {
+                totalCost += part.Cost;
+            }
+        }
+        return totalCost;
     }
 
     void ShowJob(int custid, int id)

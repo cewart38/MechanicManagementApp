@@ -24,6 +24,12 @@ namespace MechanicApp.Client.Services.PartService
                 Parts = result;
         }
 
+        public async Task<List<Part>> GetPartsList()
+        {
+            var result = await _http.GetFromJsonAsync<List<Part>>("api/part");
+            return result;
+        }
+
         public async Task GetJobParts(int id)
         {
             var result = await _http.GetFromJsonAsync<List<Part>>($"api/part/{id}");

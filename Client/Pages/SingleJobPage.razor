@@ -14,6 +14,8 @@ else
     <h3>Edit @job.JobTitle</h3>
 }
 
+
+<div style="margin-bottom: 100px;">
 <EditForm Model="job" OnSubmit="HandleSubmit">
     <div>
         <label for="jobtitle">Job Title</label>
@@ -23,16 +25,16 @@ else
         <label for="startdate">Start Date</label>
         <InputDate id="startdate" @bind-Value="job.StartDate" class="form-control"></InputDate>
     </div>
-    <div>
-        <label>
-            <InputCheckbox @bind-Value="job.IsCompleted" />
-            Job Completed
-        </label>
+    <div class="mt-3">
+        <div class="form-check">
+            <InputCheckbox id="completed" @bind-Value="job.IsCompleted" class="form-check-input"></InputCheckbox>
+            <label class="form-check-label" for="completed">Job Completed</label>
+        </div>
     </div>
 
     @if (job.IsCompleted)
     {
-        <div>
+        <div class="mt-3">
             <label for="finishdate">Finish Date</label>
             <InputDate id="finishdate" @bind-Value="job.FinishDate" class="form-control"></InputDate>
         </div>
@@ -47,10 +49,10 @@ else
         <button type="button" class="btn btn-danger" @onclick="DeleteJob">Delete Job</button>
     </div>
 </EditForm>
+</div>
 
 @if (JobId != null)
 {
-
     @if (showPartTable)
     {
         <table class="table">
@@ -67,14 +69,15 @@ else
                     <tr>
                         <td>@part.Name</td>
                         <td>@part.Cost</td>
-                        <td><button class="btn btn-link text-danger" @onclick="() => DeletePart(part.ID)">
-                                <i class="bi bi-trash"></i>
+                        <td><button class="trash-button" @onclick="() => DeletePart(part.ID)">
+                                <span class="trash-icon">&#128465;</span> Delete
                             </button>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+        <p>Total Parts Cost: @TotalPartsCost (£)</p>
     }
     @if (!showPartForm)
     {
@@ -119,6 +122,8 @@ else
 
     bool showPartForm = false;
     bool showPartTable = true;
+
+    double TotalPartsCost => PartService.Parts.Sum(part => part.Cost);
 
     string btnText = string.Empty;
 
@@ -180,5 +185,6 @@ else
     async Task DeletePart(int id)
     {
         await PartService.DeletePart(id);
+        await PartService.GetJobParts((int)JobId);
     }
 }
